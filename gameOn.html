@@ -1,0 +1,134 @@
+<html>
+
+<canvas id="gameOn" width="800" height="600"> </canvas>
+
+<script>
+var canvas;
+var canvasContext;
+var ballX=50;
+var ballY=50;
+var ballSpeedX=10;
+var ballSpeedY=4;
+
+var player=0;
+var computer=0;  
+
+var panelLeftY=250;
+var panelRight=250;
+var panel_Thickness=10;
+var panel_Height=100;
+
+function calculateMousePos(evt){
+	var rect=canvas.getBoundingClientRect();
+	var root=document.documentElement;
+	var mouseX=evt.clientX - rect.left - root.scrollLeft;
+	var mouseY=evt.clientY - rect.top - root.scrollTop;
+	return{
+		x:mouseX,
+		y:mouseY
+	};
+}
+
+window.onload =function(){
+	canvas=document.getElementById('gameOn');
+canvasContext=canvas.getContext('2d');
+
+var frameSeconds=30;
+
+setInterval(function(){
+	drawComponents();
+	moveComponents();
+},1000/frameSeconds);
+
+canvas.addEventListener('mousemove',function(evt){
+	var mousePos = calculateMousePos(evt);
+	panelLeftY = mousePos.y - (panel_Height/2);
+});
+
+}
+
+function ballReset(){
+	ballSpeedX = -ballSpeedX;
+	ballX=canvas.width/2;
+	ballY=canvas.height/2;
+}
+
+function computerMovement() {
+
+	var panelRightCenter=panelRight+(panel_Height/2);
+	// body...
+	if (panelRightCenter < ballY-35) {
+		panelRight = panelRight +6;
+	}else if (panelRightCenter > ballY+35) {
+		panelRight=panelRight-6;
+	}
+
+}
+
+function moveComponents() {
+
+	computerMovement();
+
+ballX = ballX + ballSpeedX;
+ballY = ballY + ballSpeedY;
+//panelY = panelY + panelSpeedY;
+
+if (ballX < 0) {
+	if (ballY > panelLeftY && ballY < panelLeftY+panel_Height) {
+			ballSpeedX = -ballSpeedX;
+	}else {
+		ballReset();
+		computer ++;
+	}
+	}
+
+if (ballX > canvas.width) {
+	if (ballY > panelRight && ballY < panelRight+panel_Height) {
+	ballSpeedX = -ballSpeedX;	
+}else {
+	ballReset();
+	player++;
+
+}
+}
+	//ballSpeedX = -ballSpeedX;
+
+if (ballY < 0) {
+	ballSpeedY = -ballSpeedY;
+}
+if (ballY > canvas.height) {
+	ballSpeedY = -ballSpeedY;
+}
+
+}
+
+function drawComponents(){
+
+colorRect(0,0,canvas.width,canvas.height,'skyblue');
+
+colorRect(0,panelLeftY,panel_Thickness,panel_Height,'black');
+
+
+colorRect(canvas.width-panel_Thickness,panelRight,panel_Thickness,panel_Height,'black');
+
+colorCircle(ballX,ballY,10,'Red');
+
+canvasContext.fillText(player,100,100);
+canvasContext.fillText(computer,canvas.width-100,100);
+
+}
+
+function colorCircle(centerX, centerY, radius, drawColor){
+canvasContext.fillStyle = drawColor;
+canvasContext.beginPath();
+canvasContext.arc(centerX, centerY, radius, 0, Math.PI*2, true);
+canvasContext.fill();
+}
+
+function colorRect(leftX, topY, width, height, drawColor){
+	canvasContext.fillStyle= drawColor;
+	canvasContext.fillRect(leftX,topY,width,height);
+}
+
+</script>
+</html>
